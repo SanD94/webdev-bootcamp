@@ -17,14 +17,6 @@ app.get('/speak/:animal', (req, res) => {
   res.send('The ' + animal + ' says ' + "'" + sound + "'");
 });
 
-app.get('/speak/cow', (req, res) =>
-  res.send('The cow says \'Moo\'')
-);
-
-app.get('/speak/dog', (req, res) =>
-  res.send('The dog says \'Woof Woof!\'')
-);
-
 app.get('/repeat/:what/:many', (req, res) => {
   var repeat = req.params.what;
   var limit = Number(req.params.many);
