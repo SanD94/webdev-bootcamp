@@ -4,6 +4,7 @@ var express = require('express'),
   mongoose = require('mongoose'),
   bodyParser = require('body-parser'),
   Campground = require('./models/campground'),
+  Comment = require('./models/comment'),
   seedDB = require('./seeds');
 
 
@@ -22,10 +23,11 @@ app.get('/', (req, res) => {
 });
 
 app.get('/campgrounds', (req, res) => {
+  var renderFolder = __dirname + '/views/campgrounds/';
   Campground.find({}, (err, campgrounds) => {
     if (err) console.log(err);
     else
-      ejs.renderFile(__dirname + '/views/index.ejs', { campgrounds } , (err, str) => {
+      ejs.renderFile(renderFolder + 'index.ejs', { campgrounds } , (err, str) => {
         if (err) res.send(err);
         res.render('template', { body: str });
       });
@@ -33,17 +35,19 @@ app.get('/campgrounds', (req, res) => {
 });
 
 app.get('/campgrounds/new', (req, res) => {
-  ejs.renderFile(__dirname + '/views/new.ejs', (err, str) => {
+  var renderFolder = __dirname + '/views/campgrounds/';
+  ejs.renderFile(renderFolder + 'new.ejs', (err, str) => {
     if (err) res.send(err);
     res.render('template', { body: str });
   });
 });
 
 app.get('/campgrounds/:id', (req, res) => {
+  var renderFolder = __dirname + '/views/campgrounds/';
   Campground.findById(req.params.id).populate('comments').exec((err, campground) => {
     if (err) console.error(err);
     else {
-      ejs.renderFile(__dirname + '/views/show.ejs', { campground }, (err, str) => {
+      ejs.renderFile(renderFolder + 'show.ejs', { campground }, (err, str) => {
         if (err) console.error(err);
         res.render('template', { body: str });
       });
@@ -60,4 +64,36 @@ app.post('/campgrounds', (req, res) => {
   });
 });
 
-app.listen(3000, () => console.log('Yelp Camp has started!!!'));
+// ==================
+// COMMENTS ROUTES
+// ==================
+
+app.get('/campgrounds/:id/comments/new', (req, res) => {
+  var renderFolder = __dirname + '/views/comments/';
+  Campground.findById(req.params.id, (err, campground) => {
+    if (err) console.error(err);
+    ejs.renderFile(renderFolder + 'new.ejs', { campground }, (err, str) => {
+      if (err) console.error(err);
+      res.render('template', { body: str });
+    });
+  });
+});
+
+app.post('/campgrounds/:id/comments', (req, res) => {
+  Campground.findById(req.params.id, (err, campground) => {
+    if (err) {
+      console.error(err);
+      res.redirect('/campgrounds');
+    }
+    Comment.create(req.body.comment, (err, comment) => {
+      if (err) console.error(err);
+      campground.comments.push(comment);
+      campground.save();
+      res.redirect('/campgrounds/' + campground._id);
+    });
+  });
+});
+
+app.listen(3000, () => {
+  console.log('Yelp Camp has started!!!')
+});
