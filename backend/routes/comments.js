@@ -19,10 +19,13 @@ router.post('/', isLoggedIn, (req, res) => {
   Campground.findById(req.params.id, (err, campground) => {
     if (err) {
       console.error(err);
-      res.redirect('/campgrounds');
+      return res.redirect('/campgrounds');
     }
     Comment.create(req.body.comment, (err, comment) => {
-      if (err) console.error(err);
+      if (err) return console.error(err);
+      comment.author.id = req.user._id;
+      comment.author.username = req.user.username;
+      comment.save();
       campground.comments.push(comment);
       campground.save();
       res.redirect('/campgrounds/' + campground._id);

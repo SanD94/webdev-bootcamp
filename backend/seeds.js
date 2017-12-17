@@ -30,6 +30,7 @@ function seedDB() {
   Campground.remove({}, (err) => {
     if (err) console.log(err);
     console.log("remove campgrounds!");
+    /*
     data.forEach(seed =>
       Campground.create(seed, (err, campground) => {
         if (err) console.error(err);
@@ -41,7 +42,7 @@ function seedDB() {
           console.log('Created new comment');
         });
       })
-    );
+    );*/
   });
   // add a few comments
 }
