@@ -1,10 +1,10 @@
 var express = require('express'),
   router = express.Router(),
   ejs = require('ejs'),
-  Campground = require('../models/campground');
+  Campground = require('../models/campground'),
+  renderFolder = __dirname + '/../views/campgrounds/';
 
 router.get('/', (req, res) => {
-  var renderFolder = __dirname + '/../views/campgrounds/';
   Campground.find({}, (err, campgrounds) => {
     if (err) console.log(err);
     else
@@ -16,7 +16,6 @@ router.get('/', (req, res) => {
 });
 
 router.get('/new', isLoggedIn, (req, res) => {
-  var renderFolder = __dirname + '/../views/campgrounds/';
   ejs.renderFile(renderFolder + 'new.ejs', (err, str) => {
     if (err) res.send(err);
     res.render('template', { body: str });
@@ -24,7 +23,6 @@ router.get('/new', isLoggedIn, (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
-  var renderFolder = __dirname + '/../views/campgrounds/';
   Campground.findById(req.params.id).populate('comments').exec((err, campground) => {
     if (err) console.error(err);
     else {
@@ -43,6 +41,24 @@ router.post('/', isLoggedIn, (req, res) => {
   Campground.create(newCampground, (err, campground) => {
     if (err) console.log(err);
     else res.redirect('/campgrounds');
+  });
+});
+
+router.get('/:id/edit', (req, res) => {
+  Campground.findById(req.params.id, (err, campground) => {
+    if (err) return res.redirect('/campgrounds');
+    ejs.renderFile(renderFolder + 'edit.ejs', { campground }, (err, str) => {
+      if (err) return res.send(err);
+      res.render('template', { body: str });
+    });
+  });
+});
+
+router.put('/:id', (req, res) => {
+  var data = req.body.campground;
+  Campground.findByIdAndUpdate(req.params.id, data, (err, campground) => {
+    if (err) return res.redirect('/campgrounds');
+    res.redirect('/campgrounds/' + req.params.id);
   });
 });
 

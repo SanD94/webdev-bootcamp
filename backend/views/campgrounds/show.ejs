@@ -15,6 +15,7 @@
           <h4><a><%= campground.name %></a> <span class="pull-right">$9.00/night</span></h4>
           <p><%= campground.description %></p>
           <p><em>Submitted By <%= campground.author.username %></em></p>
+          <a class="btn btn-warning" href="/campgrounds/<%= campground._id %>/edit">Edit</a>
         </div>
       </div>
       <div class="well">
